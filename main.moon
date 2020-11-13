@@ -1,11 +1,16 @@
 -- Entry Point --
 
+WIDTH  = 512
+HEIGHT = 288
+
 -- Mods --
 u = require 'util' -- Helper functions
 
 -------------------------- Defs --------------------------
 local actor, back, frames, step, i, frame_iter, counter, objs, gas, des
-accel = 10   --
+local dirs
+accel = 10
+objs = {}
 ----------------------------------------------------------
 
 {graphics: g, keyboard: kbd} = love
@@ -24,9 +29,6 @@ class Actor
     @spr  = nil
     @ani  = {}
   
-  say_hi: ->
-    print "Hello there"
-
   -- Initializes sprite based on filename given
   set_sprite: (fln) =>
     @spr = g.newImage "assets/#{fln}.png"
@@ -37,7 +39,8 @@ class Actor
       @ani[i+1] = g.newImage("assets/#{fln .. i}.png")
       @ani[i+1]\setFilter('nearest', 'nearest')
 
-  movement: (dt) =>
+class Player extends Actor
+  input: (dt) =>
     
     -- calculate velocity and speed 
     @x  += @vx * dt
@@ -54,28 +57,50 @@ class Actor
        @x = 200
        @y = 200
 
+-- Decides a random planet-asset in random and draws it --
+dirs = love.filesystem.getDirectoryItems("assets/")
+rng  = love.math.newRandomGenerator()
+planets = [item for item in *dirs[,,4]] -- Finds all the names of asset folder
+
+create_planet = () ->
+
+  planet = Actor!
+  fln_ext = planets[rng\random(1, #planets)]
+
+  fln = string.reverse(string.sub(string.reverse(fln_ext), 5)) -- OBFUSCATED AFK --
+  planet.spr = g.newImage "assets/#{fln}.png"
+  planet.spr\setFilter 'nearest', 'nearest'
+
+  planet.ani[1] = planet.spr
+  for i=1, 3 do
+    planet.ani[i+1] = g.newImage("assets/#{fln}.png")
+    planet.ani[i+1]\setFilter('nearest', 'nearest')
+
+  planet.x = rng\random(0, WIDTH)
+  planet.y = rng\random(0, HEIGHT)
+
+  table.insert(objs, planet)
+
 
 love.load = () ->
   -- Initial --
-  objs = {}
-  gas = Actor!
+  create_planet()
+  create_planet()
+  create_planet()
+  create_planet()
+  create_planet()
+
+  gas = Player!
   gas\set_sprite("GasGiant")
   table.insert(objs, gas)
-
-  des = Actor!
-  des.x = 20
-  des.y = 20
-  des\set_sprite("Desert")
-  table.insert(objs, des)
-  i = 0
   frame_iter = u.counter(4)
 
-
 love.draw = () ->
-  g.setColor 0x33, 0x33, 0x33, 0xff
+  g.setColor 0x33, 0x33, 0x33, 0x00
   g.rectangle 'fill', 0, 0, 512, 288
   g.setColor 1,1,1
   for obj in *objs
+    print(obj)
     g.draw obj.spr, obj.x, obj.y, 0, 1, 1
 
 -- Movement
@@ -84,7 +109,7 @@ love.update = (dt) ->
   step += dt
   if step > .166
     step = 0
-    gas.spr = gas.ani[frame_iter()]
-    des.spr = des.ani[frame_iter()]
-  gas\movement(dt)
+    for obj in *objs
+      obj.spr = obj.ani[frame_iter()]
 
+  gas\input(dt)

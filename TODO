@@ -1,0 +1,5 @@
+## TODO
+
+- <s> Implement a counter in Actor class (not frame_iter()) because it "eats away frames from the other objects</s>      
+
+- Find a better step implementation for smooth frame transition    

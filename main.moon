@@ -1,9 +1,3 @@
-[[ TODO
-
- solved 1. Implement a counte in Actor class (not frame_iter()) because it "eats away frames from the other objects
-  2. Find a better step implementation for smooth frame transition
-
-]]
 --  Constants --
 
 WIDTH  = 512
@@ -14,8 +8,7 @@ HEIGHT = 288
 u = require 'util' -- Helper functions
 
 -- Defs --
-local actor, back, frames, step, i, frame_iter, counter, objs, gas, des
-local dirs, rng, planets
+local actor, back, frames, step, i, frame_iter, counter, objs, gas, des ,dirs, rng, planets
 accel = 10
 objs = {}
 {graphics: g, keyboard: kbd} = love
@@ -33,7 +26,7 @@ class Actor
     @mana = 10
     @spr  = nil
     @ani  = {}
-  
+
   -- Initializes sprite based on filename given
   set_sprite: (fln) =>
     @spr = g.newImage "assets/#{fln}.png"
@@ -48,22 +41,28 @@ class Player extends Actor
   input: (dt) =>
     
     -- calculate velocity and speed 
-    @x  += @vx * dt
-    @y  += @vy * dt
-    @vx *= math.pow(0.02, dt)
-    @vy *= math.pow(0.02, dt)
+    if @x - 48 < -48 then
+      @x -= @vx * 0.02
+      print(@x)
+    else
+      @x  += @vx * dt
+      @y  += @vy * dt
+      @vx *= math.pow(0.02, dt)
+      @vy *= math.pow(0.02, dt)
 
-    @vx -= dt * 1000 if kbd.isDown("a")
-    @vx += dt * 1000 if kbd.isDown("d")
-    @vy += dt * 1000 if kbd.isDown("s")
-    @vy -= dt * 1000 if kbd.isDown("w")
+      @vx -= dt * 1000 if kbd.isDown("a")
+      @vx += dt * 1000 if kbd.isDown("d")
+      @vy += dt * 1000 if kbd.isDown("s")
+      @vy -= dt * 1000 if kbd.isDown("w")
 
-    if kbd.isDown("space")
-       @x = 200
-       @y = 200
+      if kbd.isDown("space")
+         @x = 200
+         @y = 200
 
 
--- Creates a planet at a random (x
+
+--  Creates a planet at a random (x,y)
+--  TODO number of animation sprites hardcoded
 create_planet = () ->
 
   planet = Actor!
@@ -74,30 +73,24 @@ create_planet = () ->
 
   planet.ani[1] = planet.spr
   for i=1, 3 do
-    planet.ani[i+1] = g.newImage("assets/#{fln .. i}.png")
     print("assets/#{fln}.png")
+    planet.ani[i+1] = g.newImage("assets/#{fln .. i}.png")
     planet.ani[i+1]\setFilter('nearest', 'nearest')
 
-  planet.x = rng\random(0, WIDTH)
-  planet.y = rng\random(0, HEIGHT)
-  print(love.math.getRandomSeed())
+  planet.x = rng\random(48, WIDTH)
+  planet.y = rng\random(48, HEIGHT)
 
   planet
 
 
 love.load = () ->
-
-
-  -- Decides a random planet-asset in random and draws it --
+--  Decides a random planet-asset in random and draws it --
   dirs = love.filesystem.getDirectoryItems("assets/")
   planets = [item for item in *dirs[,,4]] -- Finds all the names of asset folder
   rng  = love.math.newRandomGenerator(love.timer.getTime())
   ----------------------------------------------------------
-
-  table.insert(objs, create_planet())
-  table.insert(objs, create_planet())
-  table.insert(objs, create_planet())
-  table.insert(objs, create_planet())
+  for i=1, 100
+    table.insert(objs, create_planet())
 
   gas = Player!
   gas\set_sprite("GasGiant")
@@ -109,14 +102,19 @@ love.draw = () ->
   g.rectangle 'fill', 0, 0, 512, 288
   g.setColor 1,1,1
   for obj in *objs
-    g.draw obj.spr, obj.x, obj.y, 0, 1, 1
+    g.draw obj.spr, obj.x, obj.y, 0, 1.5, 1.5
+
 
 -- Movement
 step = 0
 love.update = (dt) ->
   step += dt
+
+  -- @FIXME frame_iter() isn't guaranteed to produce 4 numbers if there are
+  -- a lot of planets to animate or when step is low number.
   if step > .16
     step = 0
+
     for obj in *objs
       obj.spr = obj.ani[frame_iter()]
 

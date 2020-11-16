@@ -3,6 +3,10 @@
 WIDTH  = 512
 HEIGHT = 288
 
+SX     = 1 -- Scale X axis
+SY     = 1 -- Scale Y axis
+BUMP   = 1.2 -- Bump Value
+
 -- Mods --
 
 u = require 'util' -- Helper functions
@@ -41,23 +45,36 @@ class Player extends Actor
   input: (dt) =>
     
     -- calculate velocity and speed 
-    if @x - 48 < -48 then
-      @x -= @vx * 0.02
-      print(@x)
-    else
-      @x  += @vx * dt
-      @y  += @vy * dt
-      @vx *= math.pow(0.02, dt)
-      @vy *= math.pow(0.02, dt)
 
-      @vx -= dt * 1000 if kbd.isDown("a")
-      @vx += dt * 1000 if kbd.isDown("d")
-      @vy += dt * 1000 if kbd.isDown("s")
-      @vy -= dt * 1000 if kbd.isDown("w")
+    -- Collision with Window
+    -- 1.2 Magic value that is being substracted is back off from bump value
+    if @x - (48 * SX) < -48
+      @x -= @vx * dt - BUMP
+      @vx = 0
+    elseif @x + ( 48 * SX) > WIDTH
+      @x -= @vx * dt + BUMP
+      @vx = 0
+    elseif @y - ( 48 * SY) < -48
+      @y -= @vy * dt - BUMP
+      @vy = 0
+    elseif @y + ( 48 * SX) > HEIGHT
+      @y -= @vy * dt + BUMP
+      @vy = 0
+    ---
 
-      if kbd.isDown("space")
-         @x = 200
-         @y = 200
+    @x  += @vx * dt
+    @y  += @vy * dt
+    @vx *= math.pow(0.02, dt)
+    @vy *= math.pow(0.02, dt)
+
+    @vx -= dt * 1000 if kbd.isDown("a")
+    @vx += dt * 1000 if kbd.isDown("d")
+    @vy += dt * 1000 if kbd.isDown("s")
+    @vy -= dt * 1000 if kbd.isDown("w")
+
+    if kbd.isDown("space")
+       @x = 200
+       @y = 200
 
 
 
@@ -102,7 +119,7 @@ love.draw = () ->
   g.rectangle 'fill', 0, 0, 512, 288
   g.setColor 1,1,1
   for obj in *objs
-    g.draw obj.spr, obj.x, obj.y, 0, 1.5, 1.5
+    g.draw obj.spr, obj.x, obj.y, 0, 1, 1
 
 
 -- Movement

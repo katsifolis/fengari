@@ -1,8 +1,12 @@
-main.lua: main.moon util.moon
-	moonc *.moon
+DIRS = .
+MOONAKIA = $(wildcard $(DIRS:=/*.moon))
 
-run:
+all: compile
 	love .
 
+compile:
+	@echo compiling ... $(MOONAKIA)
+	moonc -t . $(MOONAKIA)
+
 clean:
-	rm game.lua main.lua util.lua particle.lua
+	rm *.lua

@@ -1,6 +1,6 @@
-require 'defs'
-export *
+__G = require 'defs'
 
+export *
 {graphics: g, keyboard: kbd} = love
 
 class Actor
@@ -29,22 +29,21 @@ class Actor
 
 class Player extends Actor
   input: (dt) =>
-    
     -- calculate velocity and speed 
 
     -- Collision with Window
     -- 1.2 Magic value that is being substracted is back off from bump value
-    if @x - (48 * SX) < -48
-      @x -= @vx * dt - BUMP
+    if @x - (48 * __G.SX) < -48
+      @x -= @vx * dt - __G.BUMP
       @vx = 0
-    elseif @x + ( 48 * SX) > WIDTH
-      @x -= @vx * dt + BUMP
+    elseif @x + ( 48 * __G.SX) > __G.WIDTH
+      @x -= @vx * dt + __G.BUMP
       @vx = 0
-    elseif @y - ( 48 * SY) < -48
-      @y -= @vy * dt - BUMP
+    elseif @y - ( 48 * __G.SY) < -48
+      @y -= @vy * dt - __G.BUMP
       @vy = 0
-    elseif @y + ( 48 * SX) > HEIGHT
-      @y -= @vy * dt + BUMP
+    elseif @y + ( 48 * __G.SX) > __G.HEIGHT
+      @y -= @vy * dt + __G.BUMP
       @vy = 0
     ---
 
@@ -57,7 +56,6 @@ class Player extends Actor
     @vx += dt * 1000 if kbd.isDown("d")
     @vy += dt * 1000 if kbd.isDown("s")
     @vy -= dt * 1000 if kbd.isDown("w")
-
     if kbd.isDown("space")
        @x = 200
        @y = 200

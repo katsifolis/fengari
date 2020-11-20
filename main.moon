@@ -1,16 +1,16 @@
 -- Mods --
+_          = require 'defs' -- Globals
 u          = require 'util'
 game       = require 'game'
 -- G --
 local zawurado
 frame_adv = u.counter(4)
 
-
 love.load = () ->
   zawurado = game.Game!
   zawurado\init(50, "assets")
   zawurado.player\set_sprite("GasGiant")
-  table.insert(objs, zawurado.player)
+  table.insert(zawurado.objs, zawurado.player)
 
 
 love.draw = () ->
@@ -18,7 +18,7 @@ love.draw = () ->
   g.setColor 0x33, 0x33, 0x33, 0x00
   g.rectangle 'fill', 0, 0, 512, 288
   g.setColor 1,1,1
-  for obj in *objs
+  for obj in *zawurado.objs
     g.draw obj.spr, obj.x, obj.y, 0, 1, 1
 
 

@@ -1,5 +1,3 @@
-__G = require 'defs'
-
 export *
 {graphics: g, keyboard: kbd} = love
 
@@ -12,8 +10,6 @@ class Actor
     @vx   = 0
     @vy   = 0
     @flp  = false
-    @will = 10
-    @mana = 10
     @spr  = nil
     @ani  = {}
 
@@ -26,6 +22,10 @@ class Actor
     for i=1, 3 do
       @ani[i+1] = g.newImage("assets/#{fln .. i}.png")
       @ani[i+1]\setFilter('nearest', 'nearest')
+  collides: (fln) =>
+
+
+    
 
 class Player extends Actor
   input: (dt) =>
@@ -33,17 +33,17 @@ class Player extends Actor
 
     -- Collision with Window
     -- 1.2 Magic value that is being substracted is back off from bump value
-    if @x - (48 * __G.SX) < -48
-      @x -= @vx * dt - __G.BUMP
+    if @x - (SPR_WIDTH * SX) < -SPR_WIDTH
+      @x -= @vx * dt - BUMP
       @vx = 0
-    elseif @x + ( 48 * __G.SX) > __G.WIDTH
-      @x -= @vx * dt + __G.BUMP
+    elseif @x + ( SPR_WIDTH * SX) > WIDTH
+      @x -= @vx * dt + BUMP
       @vx = 0
-    elseif @y - ( 48 * __G.SY) < -48
-      @y -= @vy * dt - __G.BUMP
+    elseif @y - ( SPR_HEIGHT * SY) < -SPR_HEIGHT
+      @y -= @vy * dt - BUMP
       @vy = 0
-    elseif @y + ( 48 * __G.SX) > __G.HEIGHT
-      @y -= @vy * dt + __G.BUMP
+    elseif @y + ( SPR_HEIGHT * SY) > HEIGHT
+      @y -= @vy * dt + BUMP
       @vy = 0
     ---
 
@@ -52,12 +52,9 @@ class Player extends Actor
     @vx *= math.pow(0.02, dt)
     @vy *= math.pow(0.02, dt)
 
-    @vx -= dt * 1000 if kbd.isDown("a")
-    @vx += dt * 1000 if kbd.isDown("d")
-    @vy += dt * 1000 if kbd.isDown("s")
-    @vy -= dt * 1000 if kbd.isDown("w")
-    if kbd.isDown("space")
-       @x = 200
-       @y = 200
+    @vx -= dt * ACCEL if kbd.isDown("a")
+    @vx += dt * ACCEL if kbd.isDown("d")
+    @vy += dt * ACCEL if kbd.isDown("s")
+    @vy -= dt * ACCEL if kbd.isDown("w")
 
 {:Actor, :Player}

@@ -1,4 +1,3 @@
-
 -- sprite frame counter
 counter = (n)->
 	j = 0
@@ -11,16 +10,12 @@ counter = (n)->
 -- Returns the names of all individual planets not sprites
 load_asset = (fld) ->
   dirs = love.filesystem.getDirectoryItems(fld)
-  planets = [item for item in *dirs[,,4]]
   names = {}
-  for i, v in ipairs planets
-    if i-1 % 4 == 0
+  for i, v in ipairs dirs
+    if (i-1) % 4 == 0
       n = string.reverse(string.sub(string.reverse(v), 5))
       table.insert(names, n)
 
   names
- 
-
-
 
 {:counter, :load_asset}

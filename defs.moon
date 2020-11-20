@@ -2,11 +2,13 @@ export *
 --  Constants --
 WIDTH  = 512
 HEIGHT = 288
+SPR_WIDTH = 48
+SPR_HEIGHT = 48
 SX     = 1 -- Scale X axis
 SY     = 1 -- Scale Y axis
 BUMP   = 1.2 -- Bump Value
 WORLD = {} -- World Object
-accel = 10
+ACCEL = 1000
 actor = {}
 back = 0
 frames = 0
